@@ -27,7 +27,8 @@ try:
             'Shirtplatform size': 'SP Size',
             'Moteefe product': 'MTF Product',
             'Moteefe color': 'MTF Color',
-            'Moteefe size': 'MTF Size'})
+            'Moteefe size': 'MTF Size',
+            'Express Shipping': 'Exp ship'})
 
     df = df.apply(lambda x: x.astype(str).str.lower())
 

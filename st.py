@@ -1,11 +1,14 @@
 import streamlit as st
 import pandas as pd
+from io import BytesIO
+from pyxlsb import open_workbook as open_xlsb
 
 st.title('SP Atlas Query')
 
 try:
-    SHEET_ID = st.secrets["SHEET_ID"]
-    SHEET_NAME = st.secrets["SHEET_NAME"]
+    # st.secrets["SHEET_ID"]
+    SHEET_ID = '1w9oUYI3lgYDVe4I22zaQY4fMhCHeEEySytZ_Pv4Glco'
+    SHEET_NAME = 'page1'  # st.secrets["SHEET_NAME"]
     url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
 
     df = pd.read_csv(url)
@@ -51,11 +54,30 @@ try:
     cols = ((df != 'nan') & (df != 'n')).any()
     df = df[cols[cols].index]
 
-    if search:
+    if search and len(df) > 0:
         st.write(f'Input: {search}')
         st.write(f'\nNumber of results: {len(df)}\n')
 
         st.write(df)
+
+        def to_excel(df):
+            output = BytesIO()
+            writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+            format1 = workbook.add_format({'num_format': '0.00'})
+            worksheet.set_column('A:A', None, format1)
+            writer.save()
+            processed_data = output.getvalue()
+            return processed_data
+
+        df_xlsx = to_excel(df)
+        st.download_button(label='Download',
+                        data=df_xlsx,
+                        file_name='download_so_atlas.xlsx')
+    else:
+        st.write('No results.')
 
 except Exception as e:
     st.write(f'{e}')

@@ -4,9 +4,9 @@ import pandas as pd
 st.title('SP Atlas Query')
 
 try:
-    sheet_id = '1w9oUYI3lgYDVe4I22zaQY4fMhCHeEEySytZ_Pv4Glco'
-    sheet_name = 'page1'
-    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
+    SHEET_ID = '1w9oUYI3lgYDVe4I22zaQY4fMhCHeEEySytZ_Pv4Glco'
+    SHEET_NAME = 'page1'
+    url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
 
     df = pd.read_csv(url)
 

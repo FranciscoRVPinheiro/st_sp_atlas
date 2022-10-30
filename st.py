@@ -6,9 +6,8 @@ from pyxlsb import open_workbook as open_xlsb
 st.title('SP Atlas Query')
 
 try:
-    # st.secrets["SHEET_ID"]
-    SHEET_ID = '1w9oUYI3lgYDVe4I22zaQY4fMhCHeEEySytZ_Pv4Glco'
-    SHEET_NAME = 'page1'  # st.secrets["SHEET_NAME"]
+    SHEET_ID = st.secrets["SHEET_ID"]
+    SHEET_NAME = st.secrets["SHEET_NAME"]
     url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
 
     df = pd.read_csv(url)

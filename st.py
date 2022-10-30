@@ -1,39 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-# uploaded_file = st.file_uploader("Drag and drop a CSV file")
-# if uploaded_file is not None:
-
-#     dataframe = pd.read_csv(uploaded_file)
-#     st.write(dataframe)
-
-
-# try:
-#   st.title('Dimona - SP file parser')  
-
-#   uploaded_file = st.file_uploader("Only accepts CSV files")
-
-#   if uploaded_file is not None:
-
-#     df = pd.read_csv(uploaded_file)
-
-#     df.drop(df.columns[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-#             18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]], axis=1, inplace=True)
-
-#     li = []
-#     for fid, remote_id in zip(df["OrderId"], df["RemoteId"]):
-#         new_results = fid[2:], remote_id
-#         if new_results not in li:
-#             li.append(new_results)
-#         # print(new_results[0], new_results[1])
-
-#     list_df = pd.DataFrame(li)
-
-#     st.write(list_df)
-
-# except Exception as e:
-#   st.write(f'\n{e}')
-
 st.title('SP Atlas Query')
 
 try:
@@ -68,7 +35,6 @@ try:
     df['OP Tiger'] = df['OP Tiger'].apply(
         lambda x: x[:-2])
 
-    # search = input('\nAny value: ').strip().lower()
     search = st.text_input('Search:').strip().lower()
 
     if ',' in search:

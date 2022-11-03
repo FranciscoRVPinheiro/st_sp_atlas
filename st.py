@@ -38,6 +38,9 @@ try:
     df['OP Tiger'] = df['OP Tiger'].apply(
         lambda x: x[:-2])
 
+    df['Stock ID'] = df['Stock ID'].apply(
+        lambda x: x[:-2])
+
     search = st.text_input('Search:').strip().lower()
 
     if ',' in search:

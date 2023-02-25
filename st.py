@@ -35,14 +35,17 @@ def check_password():
         # Password correct.
         return True
 
-
-if check_password():
-    try:
+@st.cache_data
+def read_data():
         SHEET_ID = st.secrets["SHEET_ID"]
         SHEET_NAME = st.secrets["SHEET_NAME"]
         url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
-
         df = pd.read_csv(url)
+        return df
+
+if check_password():
+    try:
+        df = read_data()
 
         df = df.drop(['Area "name" front', 'Area "name" back',
                     'SPOD SKU ID', 'Halle SKU', 'Big Oven SKU composition', 'Printforia', 'QTco', 'Casestry'], axis=1)

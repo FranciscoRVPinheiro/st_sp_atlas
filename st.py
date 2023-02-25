@@ -3,7 +3,9 @@ import pandas as pd
 from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
 
-st.title('SP Atlas Query')
+st.set_page_config(layout='wide', page_title="SP Atlas", page_icon="🔍")
+st.title('SP Atlas Query 🔍')
+st.caption('''Returns results for any value in the SP Atlas spreadsheet like color, product name, sku or size. The query will only bring columns that have values in them. Ex: search for black.''')
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -71,27 +73,17 @@ if check_password():
         df['Stock ID'] = df['Stock ID'].apply(
             lambda x: x[:-2])
 
-        search = st.text_input('Search:').strip().lower()
+        search = st.text_input('Search:', placeholder='Search:', label_visibility="collapsed").strip().lower()
 
-        if ',' in search:
-            search = search.replace(', ', ',')
-            search = search.split(',')
-            df = df.loc[(df['SP Product'] == search[0])
-                        & (df['SP Color'] == search[1]) & (df['SP Size'] == search[2])]
-
-            df = df.dropna(axis=1, how='all')
-
-        else:
-            df = df[df.isin([search]).any(axis=1)].dropna(axis=1, how='all')
+        df = df[df.isin([search]).any(axis=1)].dropna(axis=1, how='all')
 
         cols = ((df != 'nan') & (df != 'n')).any()
         df = df[cols[cols].index]
 
         if search and len(df) > 0:
-            st.write(f'Input: {search}')
-            st.write(f'\nNumber of results: {len(df)}\n')
+            st.success(f'\nFound {len(df)} results for "{search}"\n')
 
-            st.write(df)
+            st.dataframe(df, use_container_width=True)
 
             def to_excel(df):
                 output = BytesIO()
@@ -109,9 +101,9 @@ if check_password():
             st.download_button(label='Download',
                             data=df_xlsx,
                             file_name='download_so_atlas.xlsx')
-        else:
-            st.write('No results.')
+        elif search and len(df) == 0:
+            st.error(f'\nFound {len(df)} results for "{search}"\n')
 
     except Exception as e:
-        st.write(f'{e}')
+        st.error(f'{e}')
 

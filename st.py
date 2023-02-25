@@ -35,7 +35,6 @@ def check_password():
         # Password correct.
         return True
 
-@st.cache_data
 def read_data():
         SHEET_ID = st.secrets["SHEET_ID"]
         SHEET_NAME = st.secrets["SHEET_NAME"]

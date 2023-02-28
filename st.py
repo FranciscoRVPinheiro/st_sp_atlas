@@ -15,9 +15,20 @@ def read_data():
         return df
 
 def custom_style(val):
-    # color = "orange" if val == search else "grey"
     color = "orange" if search in val else "grey"
     return f"color: {color}"
+
+def to_excel(df):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, index=False, sheet_name='Sheet1')
+    workbook = writer.book
+    worksheet = writer.sheets['Sheet1']
+    format1 = workbook.add_format({'num_format': '0.00'})
+    worksheet.set_column('A:A', None, format1)
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
 
 try:
     df = read_data()
@@ -75,6 +86,7 @@ try:
             Printlogistic.str.contains(@search, case=False) | \
             Optiger.str.contains(@search, case=False)'
             )
+    
     df = df.replace(['n','nan'], 'x')
 
     df_styled = df.style.applymap(custom_style)
@@ -84,25 +96,15 @@ try:
 
         st.dataframe(df_styled, use_container_width=True)
 
-        def to_excel(df):
-            output = BytesIO()
-            writer = pd.ExcelWriter(output, engine='xlsxwriter')
-            df.to_excel(writer, index=False, sheet_name='Sheet1')
-            workbook = writer.book
-            worksheet = writer.sheets['Sheet1']
-            format1 = workbook.add_format({'num_format': '0.00'})
-            worksheet.set_column('A:A', None, format1)
-            writer.save()
-            processed_data = output.getvalue()
-            return processed_data
-
         df_xlsx = to_excel(df)
+
         st.download_button(label='Download',
                         data=df_xlsx,
                         file_name='download_so_atlas.xlsx')
+        
     elif search and len(df) == 0:
         st.error(f'\nFound {len(df)} results for "{search}"\n')
 
 except Exception as e:
-    st.error(f'{e}')
+    st.error(e)
 

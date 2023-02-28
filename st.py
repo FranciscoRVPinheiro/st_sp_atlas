@@ -7,7 +7,6 @@ st.set_page_config(layout='wide', page_title="SP Atlas", page_icon="🔍")
 st.title('SP Atlas Query 🔍')
 st.caption('''Returns results for any value in the SP Atlas spreadsheet like color, product name, sku, size or stock id. Ex: search for black.''')
 
-@st.cache_data
 def read_data():
         SHEET_ID = st.secrets["SHEET_ID"]
         SHEET_NAME = st.secrets["SHEET_NAME"]

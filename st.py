@@ -5,7 +5,7 @@ from pyxlsb import open_workbook as open_xlsb
 
 st.set_page_config(layout='wide', page_title="SP Atlas", page_icon="🔍")
 st.title('SP Atlas Query 🔍')
-st.caption('''Returns results for any value in the SP Atlas spreadsheet like color, product name, sku, size or stock id. Ex: search for black.''')
+st.caption('Returns results for any value in the SP Atlas spreadsheet like color, product name, sku, size or stock id. The search doesn\'t need to be exact. Ex: search for black or mug or women.')
 
 def read_data():
         SHEET_ID = st.secrets["SHEET_ID"]

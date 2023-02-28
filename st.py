@@ -5,36 +5,9 @@ from pyxlsb import open_workbook as open_xlsb
 
 st.set_page_config(layout='wide', page_title="SP Atlas", page_icon="🔍")
 st.title('SP Atlas Query 🔍')
-st.caption('''Returns results for any value in the SP Atlas spreadsheet like color, product name, sku or size. The query will only bring columns that have values in them. Ex: search for black.''')
+st.caption('''Returns results for any value in the SP Atlas spreadsheet like color, product name, sku, size or stock id. Ex: search for black.''')
 
-def check_password():
-    """Returns `True` if the user had the correct password."""
-
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["password"]:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store password
-        else:
-            st.session_state["password_correct"] = False
-
-    if "password_correct" not in st.session_state:
-        # First run, show input for password.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        st.error("😕 Password incorrect")
-        return False
-    else:
-        # Password correct.
-        return True
-
+@st.cache_data
 def read_data():
         SHEET_ID = st.secrets["SHEET_ID"]
         SHEET_NAME = st.secrets["SHEET_NAME"]
@@ -42,70 +15,94 @@ def read_data():
         df = pd.read_csv(url)
         return df
 
-if check_password():
-    try:
-        df = read_data()
+def custom_style(val):
+    color = "orange" if val == search else "grey"
+    return f"color: {color}"
 
-        df = df.drop(['Area "name" front', 'Area "name" back',
-                    'SPOD SKU ID', 'Halle SKU', 'Big Oven SKU composition', 'Printforia', 'QTco', 'Casestry'], axis=1)
+try:
+    df = read_data()
 
-        df = df.rename(
-            columns={
-                'Valadio SKU ID': 'Valadio',
-                'Monster SKU ID': 'Monster',
-                'Dimona SKU composition': 'Dimona',
-                'TSAS SKU composition': 'TSAS',
-                'Dubow SKU composition': 'Dubow',
-                'Shirtplatform Product': 'SP Product',
-                'Shirtplatform color': 'SP Color',
-                'Shirtplatform size': 'SP Size',
-                'Moteefe product': 'MTF Product',
-                'Moteefe color': 'MTF Color',
-                'Moteefe size': 'MTF Size',
-                'Express Shipping': 'Exp ship'})
+    df = df.drop(['Area "name" front', 'Area "name" back',
+                'SPOD SKU ID', 'Halle SKU', 'Big Oven SKU composition', 'Printforia', 'QTco', 'Casestry', 'Unnamed: 30', 'Unnamed: 29', 
+                'Unnamed: 28', 'Unnamed: 27', 'Whitelabel', 'Express Shipping'], axis=1)
+    
+    df = df.rename(
+    columns={
+        'Valadio SKU ID': 'Valadio', 
+        'Monster SKU ID': 'Monster', 
+        'Dimona SKU composition': 'Dimona', 
+        'TSAS SKU composition': 'TSAS', 
+        'Dubow SKU composition': 'Dubow', 
+        'Shirtplatform Product': 'SP_Product',
+        'Shirtplatform color': 'SP_Color', 
+        'Shirtplatform size': 'SP_Size',
+        'Moteefe product': 'MTF_Product', 
+        'Moteefe color': 'MTF_Color', 
+        'Moteefe size': 'MTF_Size',
+        'Stock ID':'Stock_ID',
+        'Print Logistic': 'Printlogistic',
+        'OP Tiger':'Optiger'})
 
-        df = df.apply(lambda x: x.astype(str).str.lower())
+    df = df.apply(lambda x: x.astype(str))
 
-        df['Print Logistic'] = df['Print Logistic'].apply(
-            lambda x: x[:-2])
+    df['Printlogistic'] = df['Printlogistic'].apply(
+        lambda x: x[:-2])
 
-        df['OP Tiger'] = df['OP Tiger'].apply(
-            lambda x: x[:-2])
+    df['Optiger'] = df['Optiger'].apply(
+        lambda x: x[:-2])
+    
+    df['Stock_ID'] = df['Stock_ID'].apply(
+    lambda x: x[:-2])
 
-        df['Stock ID'] = df['Stock ID'].apply(
-            lambda x: x[:-2])
+    search = st.text_input('Search', placeholder='Search', label_visibility="collapsed").strip()
 
-        search = st.text_input('Search:', placeholder='Search:', label_visibility="collapsed").strip().lower()
+    df = df.query(
+        'SP_Product.str.contains(@search, case=False) | \
+            SP_Color.str.contains(@search, case=False) | \
+            SP_Size.str.contains(@search, case=False) | \
+            MTF_Product.str.contains(@search, case=False) | \
+            MTF_Color.str.contains(@search, case=False) | \
+            MTF_Size.str.contains(@search, case=False) | \
+            Stock_ID.str.contains(@search, case=False) | \
+            Valadio.str.contains(@search, case=False) | \
+            Monster.str.contains(@search, case=False) | \
+            Dimona.str.contains(@search, case=False) | \
+            TSAS.str.contains(@search, case=False) | \
+            Dubow.str.contains(@search, case=False) | \
+            Albumo.str.contains(@search, case=False) | \
+            SwiftPOD.str.contains(@search, case=False) | \
+            Polyconcept.str.contains(@search, case=False) | \
+            Printlogistic.str.contains(@search, case=False) | \
+            Optiger.str.contains(@search, case=False)'
+            )
+    df = df.replace(['n','nan'], 'x')
 
-        df = df[df.isin([search]).any(axis=1)].dropna(axis=1, how='all')
+    df_styled = df.style.applymap(custom_style)
 
-        cols = ((df != 'nan') & (df != 'n')).any()
-        df = df[cols[cols].index]
+    if search and len(df) > 0:
+        st.success(f'\nFound {len(df)} results for "{search}"\n')
 
-        if search and len(df) > 0:
-            st.success(f'\nFound {len(df)} results for "{search}"\n')
+        st.dataframe(df_styled, use_container_width=True)
 
-            st.dataframe(df, use_container_width=True)
+        def to_excel(df):
+            output = BytesIO()
+            writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+            format1 = workbook.add_format({'num_format': '0.00'})
+            worksheet.set_column('A:A', None, format1)
+            writer.save()
+            processed_data = output.getvalue()
+            return processed_data
 
-            def to_excel(df):
-                output = BytesIO()
-                writer = pd.ExcelWriter(output, engine='xlsxwriter')
-                df.to_excel(writer, index=False, sheet_name='Sheet1')
-                workbook = writer.book
-                worksheet = writer.sheets['Sheet1']
-                format1 = workbook.add_format({'num_format': '0.00'})
-                worksheet.set_column('A:A', None, format1)
-                writer.save()
-                processed_data = output.getvalue()
-                return processed_data
+        df_xlsx = to_excel(df)
+        st.download_button(label='Download',
+                        data=df_xlsx,
+                        file_name='download_so_atlas.xlsx')
+    elif search and len(df) == 0:
+        st.error(f'\nFound {len(df)} results for "{search}"\n')
 
-            df_xlsx = to_excel(df)
-            st.download_button(label='Download',
-                            data=df_xlsx,
-                            file_name='download_so_atlas.xlsx')
-        elif search and len(df) == 0:
-            st.error(f'\nFound {len(df)} results for "{search}"\n')
-
-    except Exception as e:
-        st.error(f'{e}')
+except Exception as e:
+    st.error(f'{e}')
 

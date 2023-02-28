@@ -89,6 +89,23 @@ try:
     
     df = df.replace(['n','nan'], 'x')
 
+    supplier_cols = [
+         'Valadio',
+         'Monster',
+         'Printlogistic',
+         'Dimona',
+         'TSAS',
+         'Optiger',
+         'Dubow',
+         'Albumo',
+         'SwiftPOD',
+         'Polyconcept'
+    ]
+
+    for col in supplier_cols:  
+        if len(df[col].unique()) == 1: 
+            df.drop([col], axis=1, inplace=True) 
+
     df_styled = df.style.applymap(custom_style)
 
     if search and len(df) > 0:

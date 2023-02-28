@@ -15,7 +15,8 @@ def read_data():
         return df
 
 def custom_style(val):
-    color = "orange" if val == search else "grey"
+    # color = "orange" if val == search else "grey"
+    color = "orange" if search in val else "grey"
     return f"color: {color}"
 
 try:

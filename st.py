@@ -65,7 +65,7 @@ try:
     df['Stock_ID'] = df['Stock_ID'].apply(
     lambda x: x[:-2])
 
-    search = st.text_input('Search', placeholder='Search', label_visibility="collapsed").strip()
+    search = st.text_input('Search', placeholder='Search', label_visibility="collapsed").strip().capitalize()
 
     df = df.query(
         'SP_Product.str.contains(@search, case=False) | \

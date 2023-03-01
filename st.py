@@ -33,9 +33,22 @@ def to_excel(df):
 try:
     df = read_data()
 
-    df = df.drop(['Area "name" front', 'Area "name" back',
-                'SPOD SKU ID', 'Halle SKU', 'Big Oven SKU composition', 'Printforia', 'QTco', 'Casestry', 'Unnamed: 30', 'Unnamed: 29', 
-                'Unnamed: 28', 'Unnamed: 27', 'Whitelabel', 'Express Shipping'], axis=1)
+    df = df.drop([
+        'Area "name" front', 
+        'Area "name" back',
+        'SPOD SKU ID', 
+        'Halle SKU', 
+        'Big Oven SKU composition', 
+        'Printforia', 
+        'QTco', 
+        'Casestry', 
+        'Unnamed: 30', 
+        'Unnamed: 29', 
+        'Unnamed: 28', 
+        'Unnamed: 27', 
+        'Whitelabel', 
+        'Express Shipping'
+        ], axis=1)
     
     df = df.rename(
     columns={
@@ -102,6 +115,7 @@ try:
          'Polyconcept'
     ]
 
+    # drops column only if there's only one value and this value = 'x'.
     for col in supplier_cols:  
         if df[col].nunique() == 1:
             if 'x' in df[col].values:

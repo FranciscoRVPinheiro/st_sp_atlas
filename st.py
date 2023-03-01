@@ -68,7 +68,7 @@ try:
     search = st.text_input('Search', placeholder='Search', label_visibility="collapsed").strip().capitalize()
 
     df = df.query(
-        'SP_Product.str.contains(@search, case=False) | \
+            'SP_Product.str.contains(@search, case=False) | \
             SP_Color.str.contains(@search, case=False) | \
             SP_Size.str.contains(@search, case=False) | \
             MTF_Product.str.contains(@search, case=False) | \
@@ -103,8 +103,9 @@ try:
     ]
 
     for col in supplier_cols:  
-        if len(df[col].unique()) == 1: 
-            df.drop([col], axis=1, inplace=True) 
+        if df[col].nunique() == 1:
+            if 'x' in df[col].values:
+                df.drop([col], axis=1, inplace=True) 
 
     df_styled = df.style.applymap(custom_style)
 

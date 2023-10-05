@@ -3,6 +3,8 @@ import pandas as pd
 from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
 
+# Comment to wake up the app.
+
 st.set_page_config(layout='wide', page_title="SP Atlas", page_icon="🔍")
 st.title('SP Atlas Query 🔍')
 st.caption('Returns results for any value in the SP Atlas spreadsheet like color, product name, sku, size or stock id. The results will only show suppliers that have values in their columns. The search doesn\'t need to be exact. Ex: search for black or mug or women.')
